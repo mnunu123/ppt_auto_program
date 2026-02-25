@@ -1,0 +1,16 @@
+{
+  "name": "ppt-team-agent",
+  "version": "1.0.0",
+  "description": "PPT Team Agent - Claude Code Sub-Agent and Skill based presentation generator",
+  "type": "module",
+  "scripts": {
+    "html2pptx": "node .claude/skills/pptx-skill/scripts/html2pptx.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^3.12.0",
+    "playwright": "^1.40.0",
+    "sharp": "^0.33.0",
+    "react-icons": "^5.0.0"
+  },
+  "devDependencies": {}
+}
