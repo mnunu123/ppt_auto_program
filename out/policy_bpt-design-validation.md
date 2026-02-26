@@ -1,0 +1,19 @@
+# BPT_PREMIUM 디자인 검증 리포트
+> 생성일: 2026-02-26
+
+## 결과: ✅ 통과 (⚠️  1개 경고)
+
+| 규칙 | 코드 | 상세 | 제안 |
+|------|------|------|------|
+| ⚠️  | D4-PanelCoverage | slide-07: data_cards 레이아웃인데 cards 배열이 비어있음 | cards 배열에 {value, label, desc} 객체 추가 |
+
+## 디자인 토큰
+| 항목 | 값 |
+|------|-----|
+| 배경 | #070A0D |
+| 액센트 | #02FFDC |
+| 텍스트 | #FFFFFF |
+| 보조 텍스트 | #B0BAC6 |
+| 폰트 스택 | Paperlogy → Pretendard → Noto Sans KR |
+| 커버 제목 | 42pt / 700 |
+| 메트릭 숫자 | 38pt / 700 |

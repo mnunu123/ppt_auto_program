@@ -236,7 +236,11 @@ function genSummary(slide) {
 
 // ─── 라우터: layout → HTML 생성 함수 ────────────────────────────────────────
 
-function generateSlideHTML(slide, input) {
+function generateSlideHTML(slide, input, theme) {
+  if (theme === 'BPT_PREMIUM') {
+    const bpt = require('./themes/bpt_premium');
+    return bpt.generateSlideHTML(slide, input);
+  }
   switch (slide.layout) {
     case 'cover_center_calm':
     case 'cover_top_aligned':  return genCoverCenterCalm(slide, input);
@@ -405,7 +409,7 @@ async function convertToPPTX(htmlDir, outputPptxPath) {
 
 // ─── 메인 export 함수 ────────────────────────────────────────────────────────
 
-async function exportDeck(plan, input, validation, outputPptxPath) {
+async function exportDeck(plan, input, validation, outputPptxPath, theme) {
   const outDir    = path.dirname(outputPptxPath);
   const baseName  = path.basename(outputPptxPath, '.pptx');
   const htmlDir   = path.join(outDir, `${baseName}_html`);
@@ -416,9 +420,10 @@ async function exportDeck(plan, input, validation, outputPptxPath) {
   fs.mkdirSync(outDir,  { recursive: true });
 
   // 1. HTML 생성
-  console.log(`\n📄 HTML 슬라이드 생성 (${plan.slides.length}장)...`);
+  const themeLabel = theme ? ` [${theme}]` : '';
+  console.log(`\n📄 HTML 슬라이드 생성${themeLabel} (${plan.slides.length}장)...`);
   for (const slide of plan.slides) {
-    const html     = generateSlideHTML(slide, input);
+    const html     = generateSlideHTML(slide, input, theme);
     const fileName = `slide-${String(slide.index).padStart(2, '0')}.html`;
     fs.writeFileSync(path.join(htmlDir, fileName), html, 'utf8');
   }
@@ -437,11 +442,23 @@ async function exportDeck(plan, input, validation, outputPptxPath) {
   fs.writeFileSync(validPath, report, 'utf8');
   console.log(`📊 검증 리포트: ${validPath}`);
 
+  // 5. BPT_PREMIUM 디자인 검증 리포트
+  let designValidPath = null;
+  if (theme === 'BPT_PREMIUM') {
+    const bpt = require('./themes/bpt_premium');
+    const designResult = bpt.validateDesign(plan.slides);
+    designValidPath = path.join(outDir, `${baseName}-design-validation.md`);
+    fs.writeFileSync(designValidPath, designResult.report.join('\n'), 'utf8');
+    const dStatus = designResult.pass ? '✅ 통과' : `❌ ${designResult.violations.length}건 위반`;
+    console.log(`🎨 디자인 검증${themeLabel}: ${dStatus} → ${designValidPath}`);
+  }
+
   return {
-    pptxPath:       outputPptxPath,
+    pptxPath:          outputPptxPath,
     htmlDir,
-    storyboardPath: storyPath,
-    validationPath: validPath,
+    storyboardPath:    storyPath,
+    validationPath:    validPath,
+    designValidPath,
   };
 }
 

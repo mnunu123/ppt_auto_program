@@ -19,6 +19,7 @@ function parseArgs(argv) {
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === '--in')    args.input  = argv[i + 1];
     if (argv[i] === '--out')   args.output = argv[i + 1];
+    if (argv[i] === '--theme') args.theme  = argv[i + 1];
     if (argv[i] === '--help')  args.help   = true;
   }
   return args;
@@ -34,6 +35,11 @@ function printHelp() {
 예시:
   node scripts/build_deck.js --in samples/policy_youth_rent.json --out out/policy_youth_rent.pptx
   node scripts/build_deck.js --in samples/semis_rally.json       --out out/semis_rally.pptx
+  node scripts/build_deck.js --in samples/policy_youth_rent.json --theme BPT_PREMIUM --out out/policy_bpt.pptx
+  node scripts/build_deck.js --in samples/semis_rally.json       --theme BPT_PREMIUM --out out/semis_bpt.pptx
+
+옵션:
+  --theme BPT_PREMIUM   — BPT_PREMIUM 프리미엄 다크 테마 적용
 
 입력 JSON 스키마:
   {
@@ -83,11 +89,13 @@ async function run() {
 
   const outputPath = path.resolve(args.output);
   const topicLabel = input.topic || path.basename(args.input, '.json');
+  const theme      = args.theme || null;
 
   console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`🎯 주제: ${topicLabel}`);
   console.log(`👥 청중: ${input.audience || '(미지정)'}`);
   console.log(`🎯 목표: ${input.goal || '(미지정)'}`);
+  if (theme) console.log(`🎨 테마: ${theme}`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
   // 2. Planner — 설득 흐름 선택 + one_liner 강제 생성 (Rule 0)
@@ -169,10 +177,11 @@ async function run() {
   }
 
   // 6. Exporter — HTML + PPTX + 리포트 (Rule 5 디자인 강제)
-  console.log(`[5/5] 🖨️  Exporter: HTML 생성 → PPTX 변환...`);
+  const themeLabel = theme ? ` [${theme}]` : '';
+  console.log(`[5/5] 🖨️  Exporter: HTML 생성${themeLabel} → PPTX 변환...`);
   let result;
   try {
-    result = await exportDeck(deckPlan, input, validation, outputPath);
+    result = await exportDeck(deckPlan, input, validation, outputPath, theme);
   } catch (err) {
     console.error(`\n❌ Export 실패: ${err.message}`);
     process.exit(1);
@@ -188,6 +197,9 @@ async function run() {
   console.log(`  스토리보드:     ${result.storyboardPath}`);
   console.log(`  검증 리포트:    ${result.validationPath}`);
   console.log(`  카피 리포트:    ${copyReportPath}`);
+  if (result.designValidPath) {
+    console.log(`  디자인 검증:    ${result.designValidPath}`);
+  }
   console.log(`\n🔎 검증 결과: ${validation.summary.message}`);
 
   if (validation.summary.totalWarnings > 0) {
