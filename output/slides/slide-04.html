@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- slide-04: DRAM 시장 과점 구조 — 수치 중심 데이터 슬라이드 -->
+<!-- slide-04: 국내 플랫폼 지형 — bullets_keyword 레이아웃 -->
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -11,74 +11,70 @@
       height: 405pt;
       font-family: 'Pretendard', sans-serif;
       background: #0f0f0f;
-      padding: 32pt 44pt 28pt;
+      padding: 36pt 44pt 30pt;
+      overflow: hidden;
+    }
+    .section-label {
+      font-size: 10pt; color: #3b82f6; font-weight: 600;
+      letter-spacing: 0.15em; margin-bottom: 8pt;
+    }
+    .slide-title {
+      font-size: 22pt; font-weight: 700; color: #ffffff;
+      letter-spacing: -0.02em; margin-bottom: 18pt;
+    }
+    .bullet-list {
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      gap: 9pt;
+    }
+    .bullet-item {
+      display: flex;
+      align-items: center;
+      gap: 12pt;
+      background: #1a1a1a;
+      border-radius: 4pt;
+      padding: 11pt 14pt;
+    }
+    .bullet-dot {
+      width: 6pt; height: 6pt; background: #3b82f6;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .bullet-label {
+      font-size: 12pt; font-weight: 700; color: #ffffff; min-width: 90pt;
+    }
+    .bullet-body {
+      font-size: 11pt; font-weight: 400; color: #b0b0b0;
+    }
+    .source {
+      font-size: 8.5pt; color: #555; margin-top: 12pt;
     }
   </style>
 </head>
 <body>
-  <!-- 헤더 -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20pt;">
-    <div style="display: flex; align-items: center; gap: 12pt;">
-      <p style="font-size: 8pt; font-weight: 600; color: #3b82f6; letter-spacing: 0.1em;">SECTION 01 · 시장 구조</p>
-      <div style="width: 1pt; height: 12pt; background: #252525;"></div>
-      <h2 style="font-size: 20pt; font-weight: 700; color: #ffffff;">DRAM 시장 — 3사가 93~95%를 장악</h2>
+  <p class="section-label">플랫폼 지형</p>
+  <p class="slide-title">쿠팡·네이버 양강 — 틈새 기회는 어디에</p>
+  <div class="bullet-list">
+    <div class="bullet-item">
+      <div class="bullet-dot"></div>
+      <p class="bullet-label">쿠팡 1위</p>
+      <p class="bullet-body">점유율 24.5%, 결제금액 55조 (+24%)</p>
     </div>
-    <p style="font-size: 9pt; color: rgba(255,255,255,0.2);">04 / 12</p>
-  </div>
-
-  <!-- 상단 빅 넘버 -->
-  <div style="display: flex; gap: 12pt; margin-bottom: 16pt;">
-    <div style="flex: 1; background: #1a1a1a; border-radius: 8pt; padding: 14pt 16pt; border-top: 2pt solid #10b981;">
-      <p style="font-size: 9pt; color: #b0b0b0; margin-bottom: 6pt;">SK하이닉스 DRAM 점유율</p>
-      <p style="font-size: 30pt; font-weight: 800; color: #10b981; letter-spacing: -0.02em; line-height: 1;">33.2%</p>
-      <p style="font-size: 9pt; color: #b0b0b0; margin-top: 4pt;">HBM 57~62% 독점</p>
+    <div class="bullet-item">
+      <div class="bullet-dot"></div>
+      <p class="bullet-label">네이버 2위</p>
+      <p class="bullet-body">점유율 23.3%, 검색 연계 쇼핑 강세</p>
     </div>
-    <div style="flex: 1; background: #1a1a1a; border-radius: 8pt; padding: 14pt 16pt; border-top: 2pt solid #f59e0b;">
-      <p style="font-size: 9pt; color: #b0b0b0; margin-bottom: 6pt;">삼성전자 DRAM 점유율</p>
-      <p style="font-size: 30pt; font-weight: 800; color: #f59e0b; letter-spacing: -0.02em; line-height: 1;">32.6%</p>
-      <p style="font-size: 9pt; color: #b0b0b0; margin-top: 4pt;">HBM 17→35% 빠른 확대</p>
+    <div class="bullet-item">
+      <div class="bullet-dot"></div>
+      <p class="bullet-label">나머지</p>
+      <p class="bullet-body">G마켓·옥션·SSG 10.1% / 11번가 7% / 카카오 5%</p>
     </div>
-    <div style="flex: 1; background: #1a1a1a; border-radius: 8pt; padding: 14pt 16pt; border-top: 2pt solid #3b82f6;">
-      <p style="font-size: 9pt; color: #b0b0b0; margin-bottom: 6pt;">마이크론 DRAM 점유율</p>
-      <p style="font-size: 30pt; font-weight: 800; color: #3b82f6; letter-spacing: -0.02em; line-height: 1;">25.7%</p>
-      <p style="font-size: 9pt; color: #b0b0b0; margin-top: 4pt;">B2C 철수 후 기업용 집중</p>
-    </div>
-    <div style="flex: 1; background: #1a1a1a; border-radius: 8pt; padding: 14pt 16pt; border-top: 2pt solid #6b7280;">
-      <p style="font-size: 9pt; color: #b0b0b0; margin-bottom: 6pt;">기타 (CXMT 등)</p>
-      <p style="font-size: 30pt; font-weight: 800; color: #6b7280; letter-spacing: -0.02em; line-height: 1;">8~9%</p>
-      <p style="font-size: 9pt; color: #b0b0b0; margin-top: 4pt;">중국 CXMT 5% · 대만 Nanya 2%</p>
+    <div class="bullet-item">
+      <div class="bullet-dot"></div>
+      <p class="bullet-label">틈새 전략</p>
+      <p class="bullet-body">수수료↑ → D2C·버티컬 이탈 증가 — 자사몰 기회 확대</p>
     </div>
   </div>
-
-  <!-- 점유율 바 시각화 -->
-  <div style="background: #1a1a1a; border-radius: 8pt; padding: 14pt 20pt; flex: 1; display: flex; flex-direction: column; justify-content: center;">
-    <p style="font-size: 9pt; color: #b0b0b0; margin-bottom: 10pt; letter-spacing: 0.05em;">DRAM 시장 점유율 분포 (2025년 3분기)</p>
-    <div style="height: 20pt; border-radius: 4pt; overflow: hidden; display: flex;">
-      <div style="width: 33.2%; background: #10b981; display: flex; align-items: center; justify-content: center;">
-        <p style="font-size: 8pt; font-weight: 700; color: #fff;">SK 33.2%</p>
-      </div>
-      <div style="width: 32.6%; background: #f59e0b; display: flex; align-items: center; justify-content: center;">
-        <p style="font-size: 8pt; font-weight: 700; color: #fff;">삼성 32.6%</p>
-      </div>
-      <div style="width: 25.7%; background: #3b82f6; display: flex; align-items: center; justify-content: center;">
-        <p style="font-size: 8pt; font-weight: 700; color: #fff;">MU 25.7%</p>
-      </div>
-      <div style="width: 8.5%; background: #374151; display: flex; align-items: center; justify-content: center;">
-        <p style="font-size: 7pt; color: #9ca3af;">기타</p>
-      </div>
-    </div>
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12pt;">
-      <p style="font-size: 11pt; color: #ffffff;"><strong>3사 합산 91.5% = 사실상 가격 결정권 보유</strong></p>
-      <p style="font-size: 9pt; color: rgba(255,255,255,0.3);">출처: TrendForce 2025-3Q</p>
-    </div>
-  </div>
-
-  <!-- 푸터 -->
-  <div style="margin-top: 10pt; display: flex; justify-content: flex-end;">
-    <p style="font-size: 9pt; color: #3b82f6;">다음: HBM 전략 →</p>
-  </div>
+  <p class="source">출처: CEO스코어, 와이즈앱, TENANT news 2024</p>
 </body>
 </html>

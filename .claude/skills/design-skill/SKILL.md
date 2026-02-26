@@ -3,7 +3,7 @@
   1. 역할을 "실행(HTML 생성)"으로 엄격히 제한 — slides-spec.md를 입력으로 받아 slides/*.html만 생성한다.
   2. Rules Pack을 HTML 구현 지침으로 내장: cover 프리셋 2종, gradient_box, typography, overflow 규칙.
   3. 스펙에 없는 내용 추가·판단 금지 — 위반 또는 누락 발견 시 오류 리포트만 출력.
-  4. 미디어 자동재생·반복·동시재생 구현 금지 (보류). 시각 규칙(표지/타이포/줄글금지)은 반드시 적용.
+  4. 미디어 메타태그 지원: cover 슬라이드에 data-media-role 메타태그를 display:none으로 삽입 (html2pptx 무시됨). 실제 미디어 임베딩은 pptx-skill의 media-patch.py가 처리.
   5. 슬라이드 치수 고정: 720pt × 405pt (16:9), overflow:hidden 강제.
 -->
 
@@ -354,6 +354,26 @@ Pretendard CDN:
 
 ---
 
+### 규칙 11: cover 슬라이드 미디어 메타태그
+
+slides-spec.md slide-01에 `**media**` 블록이 있을 때, HTML에 `display:none` 메타태그를 삽입한다.
+html2pptx.cjs는 이 태그를 무시하며, media-patch.py가 파싱할 때 사용한다.
+
+```html
+<!-- cover 슬라이드 body 최하단에 삽입 -->
+<div style="display:none" data-media-role="video"
+     data-path="output/assets/cover-video.mp4"
+     data-autoplay="true" data-loop="true" data-mute="true"></div>
+<div style="display:none" data-media-role="audio"
+     data-path="output/assets/cover-audio.mp3"
+     data-autoplay="true" data-loop="true"></div>
+```
+
+> **주의**: html2pptx.cjs의 `<div>` 파싱 대상은 `background` 또는 `border` CSS 속성이 있는 것만이다.
+> `display:none` div는 렌더링 시 크기가 0이므로 변환 결과에 영향 없음. 삽입 위치는 `</body>` 직전.
+
+---
+
 ## 실행 순서
 
 ### Step 1. slides-spec.md 읽기
@@ -399,7 +419,7 @@ FOR EACH slide in spec:
 | 컬러 강조 임의 추가 | R3 위반 |
 | 불릿 6개 초과 임의 추가 | R6 위반 |
 | CSS 그라데이션 배경 (cover 제외) | PPTX 변환 실패 |
-| 미디어 자동재생 / 반복 / 동시재생 | **보류 — 이번 단계 금지** |
+| HTML에 `<video>` / `<audio>` 태그 삽입 | html2pptx 미지원 — media-patch.py 경유 |
 | JavaScript 삽입 | PPTX 변환 미지원 |
 | `overflow: hidden` 제거 | 레이아웃 깨짐 |
 | body `width/height` 변경 | 16:9 치수 깨짐 |

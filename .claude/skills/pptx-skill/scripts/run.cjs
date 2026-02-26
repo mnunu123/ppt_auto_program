@@ -1,5 +1,5 @@
 /**
- * run.cjs - 반도체 빅3 PPT HTML 슬라이드 → PPTX 변환 runner
+ * run.cjs - 이커머스 트렌드 & 수익화 전략 PPT HTML 슬라이드 → PPTX 변환 runner
  * 실행: node .claude/skills/pptx-skill/scripts/run.cjs
  * (output/ 디렉토리에서 실행 OR outputDir 변수 수정)
  */
@@ -8,11 +8,12 @@ const html2pptx = require('./html2pptx.cjs');
 const pptxgen = require('pptxgenjs');
 const path = require('path');
 const fs = require('fs');
+const { spawnSync } = require('child_process');
 
 async function main() {
   const outputDir = path.resolve(__dirname, '../../../../output');
   const slidesDir = path.join(outputDir, 'slides');
-  const outputFile = path.join(outputDir, '반도체빅3_메모리시장.pptx');
+  const outputFile = path.join(outputDir, '이커머스_수익화전략.pptx');
 
   // 슬라이드 파일 목록
   const slideFiles = [];
@@ -54,6 +55,30 @@ async function main() {
   if (successCount > 0) {
     await pres.writeFile({ fileName: outputFile });
     console.log(`\n✨ PPTX 저장 완료: ${outputFile}\n`);
+
+    // ── media-patch.py 호출 (cover 슬라이드 video+audio 임베딩) ──
+    const specPath = path.join(outputDir, 'slides-spec.md');
+    const mediaPatchScript = path.resolve(__dirname, 'media-patch.py');
+    if (fs.existsSync(specPath) && fs.existsSync(mediaPatchScript)) {
+      const pythonCmds = ['python', 'python3'];
+      let patched = false;
+      for (const cmd of pythonCmds) {
+        const result = spawnSync(cmd, [mediaPatchScript, outputFile, specPath], {
+          stdio: 'inherit',
+          encoding: 'utf-8',
+        });
+        if (result.status === 0) { patched = true; break; }
+        if (result.error && result.error.code === 'ENOENT') continue; // 명령어 없음
+        console.warn(`⚠️  media-patch 실패 (${cmd}): exit ${result.status}. PPTX는 미디어 없이 저장됨.`);
+        break;
+      }
+      if (!patched && pythonCmds.every(c => {
+        const r = spawnSync(c, ['--version'], { stdio: 'ignore' });
+        return r.error && r.error.code === 'ENOENT';
+      })) {
+        console.warn('⚠️  python/python3 미설치. media-patch 스킵. PPTX는 미디어 없이 저장됨.');
+      }
+    }
   } else {
     console.log('\n⛔ 변환된 슬라이드가 없어 파일을 저장하지 않았습니다.\n');
   }

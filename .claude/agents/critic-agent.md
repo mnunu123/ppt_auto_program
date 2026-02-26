@@ -1,7 +1,7 @@
 <!--
   CHANGE SUMMARY (5줄):
   1. 신규 에이전트 — 생성된 slide-outline.md + slides-spec.md의 품질 게이트 검사 전담.
-  2. 6종 위반 카테고리 정의: R1 제목줄수 / R2 줄글 / R3 컬러강조 / R4 cover과부하 / R5 가독성층 / R6 밀도.
+  2. 7종 위반 카테고리 정의: R1 제목줄수 / R2 줄글 / R3 컬러강조 / R4 cover과부하 / R5 가독성층 / R6 밀도 / R7 cover미디어완전성.
   3. 위반 발견 시 critique.md(수정 지시) 출력 → organizer-agent 재작성 요청.
   4. 위반 없을 시 "ALL PASS" 선언 → design-skill 진행 승인 신호.
   5. JS 코드 변경 없이 문서 기반 루프만으로 품질 보증 구현 (Doing 없음, Thinking만).
@@ -114,6 +114,20 @@ Read, Write
 
 ---
 
+### R7: cover 미디어 완전성
+
+- **기준**: slide-01에 `**media**` 블록이 선언된 경우, video·audio·timing 3개 하위 필드가 모두 존재해야 한다.
+- **위반 감지**:
+  - media 블록이 있는데 video·audio·timing 중 하나 이상이 누락
+  - video 또는 audio 블록에 `path:` 필드가 없는 경우
+- **수정 지시 형식**:
+  ```
+  [slide-01] R7 — media 블록 불완전: [누락 필드] 없음.
+  제안: [누락 필드] 추가. 또는 media 블록 전체 제거 (미디어 없이 진행 시).
+  ```
+
+---
+
 ## 실행 순서
 
 ### Step 1. 파일 읽기
@@ -135,6 +149,7 @@ FOR EACH slide in slides-spec.md:
   CHECK R4: cover type + background 복잡도
   CHECK R5: background.type vs readability_layer.type 매칭
   CHECK R6: len(items) <= 6
+  CHECK R7: slide-01의 media 블록 선언 시 video/audio/timing 완전성
 
   IF 위반 발견: violations 목록에 추가
 ```
@@ -198,6 +213,7 @@ FOR EACH slide in slides-spec.md:
 | R4 cover 제한 | N | 0 | N |
 | R5 가독성 레이어 | N | 0 | N |
 | R6 밀도 | N | 0 | N |
+| R7 cover 미디어 완전성 | 1 | 0 | 1 |
 ```
 
 ---

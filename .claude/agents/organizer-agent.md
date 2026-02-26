@@ -39,6 +39,7 @@ Read, Write, Edit
 | **G4** | gradient_box 조건부 | 복잡/동적 배경에만 적용 | 단색 배경에 gradient_box → 제거 |
 | **G5** | cover 레이아웃 제한 | cover_top_aligned 또는 cover_center_calm만 허용 | 과도한 동적 배경 → calm 버전으로 교체 |
 | **G6** | 슬라이드 밀도 | 불릿 ≤ 6개/슬라이드 | 7개↑ → 슬라이드 분할 또는 하위 항목 발표자 노트 이동 |
+| **G7** | cover media 완전성 | media 블록 선언 시 video·audio·timing 3개 모두 필요 | 일부만 선언 → 누락 필드 추가 또는 전체 media 블록 제거 |
 
 ---
 
@@ -94,6 +95,7 @@ FOR EACH slide:
   G4: readability_layer → 단색 배경이면 none 강제
   G5: cover type → 허용 외 타입이면 calm으로 변경
   G6: items 수 → 6초과이면 분할 또는 이동
+  G7: media 블록 선언 시 → video/audio/timing 3개 모두 존재하는지 확인
 ```
 
 ---
@@ -204,7 +206,23 @@ design-skill이 HTML을 생성할 수 있도록 기계 판독 가능 스펙을 �
     - source: "[출처 텍스트]"
     - next: "[다음 슬라이드 제목 →]"
     - page: "NN / 전체장수"
+  - **media** (선택 — cover 슬라이드만):
+    - video:
+        path: "output/assets/cover-video.mp4"
+        mute: true
+        autoplay: true
+        loop: true
+    - audio:
+        path: "output/assets/cover-audio.mp3"
+        autoplay: true
+        loop: true
+        visible: false
+    - timing:
+        start_with_previous: true
 ```
+
+> **media 블록 규칙**: cover 슬라이드에만 허용. 선언 시 video·audio·timing 3개 모두 필요(G7).
+> 실제 파일이 없어도 spec 작성은 가능하다 — media-patch.py가 파일 존재 여부를 런타임에 확인한다.
 
 ---
 
@@ -241,6 +259,53 @@ design-skill이 HTML을 생성할 수 있도록 기계 판독 가능 스펙을 �
     - next: "목차 →"
     - page: "01 / 12"
 ```
+
+### 예시 1b: 표지 슬라이드 — media 블록 포함
+
+```markdown
+### slide-01
+
+- **type**: cover_center_calm
+- **layout**:
+  - columns: 1
+- **background**:
+  - type: solid
+  - value: #0b0e1e
+- **readability_layer**:
+  - type: none
+- **typography**:
+  - title_lines: 1
+  - emphasis: weight_only
+  - bullet_only: false
+- **constraints**:
+  - max_bullets: 0
+  - overflow: hidden
+- **content**:
+  - section_label: "2026 이커머스 실전 가이드"
+  - title: "이커머스 트렌드 & 수익화 전략"
+  - subtitle: "지금 이커머스에서 돈 버는 사람들의 공통점"
+  - items: []
+  - presenter_note: "인트로. 발표 목적 소개."
+  - footer:
+    - source: ""
+    - next: "목차 →"
+    - page: "01 / 12"
+  - **media**:
+    - video:
+        path: "output/assets/cover-video.mp4"
+        mute: true
+        autoplay: true
+        loop: true
+    - audio:
+        path: "output/assets/cover-audio.mp3"
+        autoplay: true
+        loop: true
+        visible: false
+    - timing:
+        start_with_previous: true
+```
+
+---
 
 ### 예시 2: 데이터/근거 슬라이드 (data_cards)
 

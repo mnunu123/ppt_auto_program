@@ -234,6 +234,7 @@ function addElements(slideData, targetSlide, pres) {
       if (el.style.margin) textOptions.margin = el.style.margin;
       if (el.style.rotate !== undefined) textOptions.rotate = el.style.rotate;
       if (el.style.transparency !== null && el.style.transparency !== undefined) textOptions.transparency = el.style.transparency;
+      if (el.style.charSpacing !== undefined) textOptions.charSpacing = el.style.charSpacing;
 
       targetSlide.addText(el.text, textOptions);
     }
@@ -840,12 +841,19 @@ async function extractSlideData(page) {
 
       if (rotation !== null) baseStyle.rotate = rotation;
 
+      // Extract letter-spacing as charSpacing (browser returns computed px value, convert to pt)
+      if (computed.letterSpacing && computed.letterSpacing !== 'normal') {
+        const charSpacingPt = pxToPoints(computed.letterSpacing);
+        if (charSpacingPt !== 0) baseStyle.charSpacing = charSpacingPt;
+      }
+
       const hasFormatting = el.querySelector('b, i, u, strong, em, span, br');
 
       if (hasFormatting) {
-        // Text with inline formatting
+        // Text with inline formatting — pass charSpacing to all runs
         const transformStr = computed.textTransform;
-        const runs = parseInlineFormatting(el, {}, [], (str) => applyTextTransform(str, transformStr));
+        const charSpacingOpts = baseStyle.charSpacing !== undefined ? { charSpacing: baseStyle.charSpacing } : {};
+        const runs = parseInlineFormatting(el, charSpacingOpts, [], (str) => applyTextTransform(str, transformStr));
 
         // Adjust lineSpacing based on largest fontSize in runs
         const adjustedStyle = { ...baseStyle };

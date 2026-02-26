@@ -4,7 +4,7 @@
   2. 입력 표준화: output/slides/*.html (design-skill 산출물) → 출력: output/*.pptx.
   3. run.cjs runner 실행 방법 및 CSS 그라데이션 제한 사항 명시.
   4. LAYOUT_16x9 고정 (720pt×405pt = 10"×5.625") — LAYOUT_WIDE 사용 금지.
-  5. 미디어 자동재생·반복·동시재생 구현 금지 (보류).
+  5. 미디어 임베딩: html2pptx.cjs 변환 후 media-patch.py가 OOXML 패치로 cover 슬라이드에 video+audio 삽입.
 -->
 
 ---
@@ -82,7 +82,7 @@ html2pptx.cjs가 **지원하지 않는** CSS:
 | `radial-gradient()` 배경 | → 동일하게 오류. solid로 대체. |
 | `position: absolute` | → 제한적 지원. 레이아웃 깨질 수 있음. |
 | JavaScript | → 완전 무시. 인터랙티브 기능 불가. |
-| 미디어 자동재생/반복 | → **구현 보류. 삽입 금지.** |
+| 미디어 자동재생/반복 | → html2pptx 미지원. media-patch.py가 OOXML 패치로 처리. |
 
 > **표지 슬라이드 (cover)**: background가 CSS 그라데이션이면 반드시 solid 색상으로 변환 후 실행.
 
@@ -147,8 +147,61 @@ html2pptx.cjs가 **지원하지 않는** CSS:
 |------|------|
 | 슬라이드 내용 수정 | 역할 침범 |
 | LAYOUT_WIDE 사용 | 치수 불일치 (13.3"≠10") |
-| 미디어 자동재생/반복/동시재생 | **보류 — 이번 단계 금지** |
+| 미디어 HTML 직접 삽입 | html2pptx 미지원 — media-patch.py 경유 |
 | `#` 포함 색상 코드 | PptxGenJS 파일 손상 |
+
+---
+
+## 미디어 임베딩 (cover 슬라이드 video+audio)
+
+### 동작 원리
+
+```
+html2pptx.cjs → pres.writeFile() → output/*.pptx
+                                        ↓  (run.cjs 자동 호출)
+                                  media-patch.py
+                                  slides-spec.md의 slide-01 media 블록 읽기
+                                        ↓
+                  ppt/slides/slide1.xml  → p:pic(video/audio) + p:timing 삽입
+                  ppt/slides/_rels/slide1.xml.rels → 관계 추가
+                  [Content_Types].xml   → mp4/mp3 MIME 등록
+                  ppt/media/            → 미디어 파일 복사
+```
+
+### 필요 조건
+
+| 조건 | 설명 |
+|------|------|
+| slides-spec.md slide-01에 `**media**` 블록 | video·audio·timing 3개 필드 모두 필요 |
+| `output/assets/cover-video.mp4` 배치 | 임의 MP4 1초 이상 |
+| `output/assets/cover-audio.mp3` 배치 | 임의 MP3 |
+| Python 3.6+ 설치 (`python` 또는 `python3`) | stdlib만 사용 (zipfile, re) |
+
+### Fallback 동작
+
+| 상황 | 동작 |
+|------|------|
+| python/python3 없음 | WARNING 출력, PPTX는 미디어 없이 저장 |
+| cover-video.mp4 없음 | WARNING + video 건너뜀, audio만 처리 |
+| cover-audio.mp3 없음 | WARNING + audio 건너뜀, video만 처리 |
+| 둘 다 없음 | "Nothing to patch" 출력, 정상 종료 |
+| slides-spec.md media 블록 없음 | 패치 스킵, 정상 종료 |
+
+### 스모크 테스트 체크리스트
+
+사전 조건:
+1. `output/assets/cover-video.mp4` 배치 (임의 MP4 1초 이상)
+2. `output/assets/cover-audio.mp3` 배치 (임의 MP3)
+3. `output/slides-spec.md` slide-01에 media 블록 추가
+
+검증:
+- [ ] `node run.cjs` 실행 시 "미디어 패치 시작..." 출력
+- [ ] "[media-patch] Patched successfully:" 출력
+- [ ] PowerPoint 슬라이드쇼 → 슬라이드 1 진입 즉시 영상 자동재생
+- [ ] 음성이 영상과 동시 시작
+- [ ] 30초 이상 루프 재생 확인
+- [ ] 다음 슬라이드로 넘길 때 정지
+- [ ] media 파일 없을 때 WARNING 출력 후 PPTX 정상 저장
 
 ---
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- slide-03: 세 기업 개요 & 공통점 — bullets_keyword 레이아웃 -->
+<!-- slide-03: 시장 규모 현황 — data_cards 레이아웃 -->
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -11,77 +11,69 @@
       height: 405pt;
       font-family: 'Pretendard', sans-serif;
       background: #0f0f0f;
-      padding: 32pt 44pt 28pt;
-      display: flex;
-      flex-direction: column;
+      padding: 36pt 44pt 32pt;
       overflow: hidden;
     }
-    ul { list-style: none; padding: 0; }
-    li { display: flex; align-items: flex-start; gap: 10pt; margin-bottom: 9pt; }
-    li::before { content: ""; display: block; width: 5pt; height: 5pt; background: #3b82f6; border-radius: 50%; flex-shrink: 0; margin-top: 5pt; }
+    .section-label {
+      font-size: 10pt; color: #3b82f6; font-weight: 600;
+      letter-spacing: 0.15em; margin-bottom: 8pt;
+    }
+    .slide-title {
+      font-size: 22pt; font-weight: 700; color: #ffffff;
+      letter-spacing: -0.02em; margin-bottom: 20pt;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10pt;
+      margin-bottom: 14pt;
+    }
+    .card {
+      background: #1a1a1a;
+      border-radius: 6pt;
+      padding: 16pt 14pt;
+      border-top: 2pt solid #3b82f6;
+    }
+    .card-value {
+      font-size: 22pt; font-weight: 800; color: #3b82f6;
+      line-height: 1.1; margin-bottom: 6pt;
+    }
+    .card-label {
+      font-size: 11pt; font-weight: 700; color: #ffffff; margin-bottom: 4pt;
+    }
+    .card-desc {
+      font-size: 9pt; color: #888; font-weight: 400;
+    }
+    .source {
+      font-size: 8.5pt; color: #555;
+    }
   </style>
 </head>
 <body>
-  <!-- 헤더 -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20pt;">
-    <div style="display: flex; align-items: center; gap: 12pt;">
-      <p style="font-size: 8pt; font-weight: 600; color: #3b82f6; letter-spacing: 0.1em;">SECTION 01 · 시장 구조</p>
-      <div style="width: 1pt; height: 12pt; background: #252525;"></div>
-      <h2 style="font-size: 20pt; font-weight: 700; color: #ffffff;">빅3의 공통점 — 과점과 동반 전환</h2>
+  <p class="section-label">시장 현황</p>
+  <p class="slide-title">이커머스 — 성숙했지만 기회는 여전히 크다</p>
+  <div class="cards-grid">
+    <div class="card">
+      <p class="card-value">242조</p>
+      <p class="card-label">국내 시장</p>
+      <p class="card-desc">2024 사상 최대 / +6% YoY</p>
     </div>
-    <p style="font-size: 9pt; color: rgba(255,255,255,0.2);">03 / 12</p>
-  </div>
-
-  <!-- 2컬럼 콘텐츠 -->
-  <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24pt;">
-    <!-- 왼쪽 컬럼 -->
-    <div style="display: flex; flex-direction: column; gap: 0;">
-      <!-- 기업 배지 -->
-      <div style="display: flex; gap: 8pt; margin-bottom: 16pt;">
-        <div style="padding: 5pt 12pt; background: #10b981; border-radius: 4pt;"><p style="font-size: 9pt; font-weight: 700; color: #ffffff;">SK하이닉스</p></div>
-        <div style="padding: 5pt 12pt; background: #f59e0b; border-radius: 4pt;"><p style="font-size: 9pt; font-weight: 700; color: #ffffff;">삼성전자</p></div>
-        <div style="padding: 5pt 12pt; background: #3b82f6; border-radius: 4pt;"><p style="font-size: 9pt; font-weight: 700; color: #ffffff;">마이크론</p></div>
-      </div>
-
-      <ul>
-        <li>
-          <p style="font-size: 12pt; color: #ffffff; line-height: 1.5;"><strong>DRAM 과점</strong>: 3사 합산 93~95% 점유</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #b0b0b0; line-height: 1.5;">SK하이닉스 33.2% · 삼성전자 32.6% · 마이크론 25.7%</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #ffffff; line-height: 1.5;"><strong>HBM 전환</strong>: 일반 DRAM 대비 5배 이상 마진</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #b0b0b0; line-height: 1.5;">2026년 HBM 생산분 3사 모두 전량 완판 상태</p>
-        </li>
-      </ul>
+    <div class="card">
+      <p class="card-value">$5.06조</p>
+      <p class="card-label">글로벌 시장</p>
+      <p class="card-desc">2025년 기준 / +8.3% 성장</p>
     </div>
-
-    <!-- 오른쪽 컬럼 -->
-    <div style="display: flex; flex-direction: column; gap: 0; padding-top: 36pt;">
-      <ul>
-        <li>
-          <p style="font-size: 12pt; color: #ffffff; line-height: 1.5;"><strong>공급 규율</strong>: DDR4 신규 주문 사실상 동시 중단</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #b0b0b0; line-height: 1.5;">장기 공급계약 단기 전환 → 판매자 우위 시장 확립</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #ffffff; line-height: 1.5;"><strong>AI 수요</strong>: 빅테크 2026년 AI 인프라 총 투자</p>
-        </li>
-        <li>
-          <p style="font-size: 12pt; color: #b0b0b0; line-height: 1.5;">MS·아마존·알파벳·메타 합산 1,000억 달러 공시</p>
-        </li>
-      </ul>
+    <div class="card">
+      <p class="card-value">27.7억</p>
+      <p class="card-label">온라인 쇼핑객</p>
+      <p class="card-desc">전 세계 기준 / 2025년</p>
+    </div>
+    <div class="card">
+      <p class="card-value">20.5%</p>
+      <p class="card-label">소매 비중</p>
+      <p class="card-desc">전체 소매 중 온라인 비중</p>
     </div>
   </div>
-
-  <!-- 푸터 -->
-  <div style="margin-top: 12pt; padding-top: 10pt; border-top: 1px solid #252525; display: flex; justify-content: space-between; align-items: center;">
-    <p style="font-size: 9pt; color: rgba(255,255,255,0.25);">출처: TrendForce 2025-3Q · Counterpoint Research 2025</p>
-    <p style="font-size: 9pt; color: #3b82f6;">다음: DRAM 점유율 상세 수치 →</p>
-  </div>
+  <p class="source">출처: 통계청, Shopify, SellersCommerce 2024~2025</p>
 </body>
 </html>
