@@ -2,8 +2,9 @@
 
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
+const fs            = require('fs');
+const path          = require('path');
+const { spawnSync } = require('child_process');
 
 // ─── 디자인 상수 ─────────────────────────────────────────────────────────────
 
@@ -372,6 +373,56 @@ function generateValidationReport(validation, plan, input) {
   return lines.filter((l) => l !== undefined).join('\n');
 }
 
+// ─── cover 슬라이드 동영상 자동 임베딩 ──────────────────────────────────────
+// assets/ 폴더에 MP4 파일이 있으면 PPTX 첫 슬라이드에 자동으로 삽입한다.
+// Remotion 렌더 결과를 assets/에 복사(또는 심볼릭 링크)하는 것만으로 동작.
+
+const ASSETS_DIR      = path.resolve(__dirname, '../assets');
+const MEDIA_PATCH_PY  = path.resolve(
+  __dirname, '../.claude/skills/pptx-skill/scripts/media-patch.py'
+);
+
+/**
+ * assets/ 폴더를 스캔해 첫 번째 MP4를 PPTX 커버 슬라이드에 임베딩한다.
+ * Python(media-patch.py --video) 경로로 처리.
+ * @returns {string|null} 임베딩된 영상 경로, 없거나 실패하면 null
+ */
+function embedVideoInCover(pptxPath) {
+  // 1. assets/ 존재 여부
+  if (!fs.existsSync(ASSETS_DIR)) return null;
+
+  // 2. MP4 파일 스캔 (알파벳순, 첫 번째 사용)
+  const mp4s = fs.readdirSync(ASSETS_DIR)
+    .filter((f) => f.toLowerCase().endsWith('.mp4'))
+    .sort();
+  if (mp4s.length === 0) return null;
+
+  const videoPath = path.join(ASSETS_DIR, mp4s[0]);
+  console.log(`\n🎬 커버 동영상 감지: ${mp4s[0]}`);
+
+  // 3. media-patch.py 존재 확인
+  if (!fs.existsSync(MEDIA_PATCH_PY)) {
+    console.warn('⚠️  media-patch.py 없음. 영상 임베딩 스킵.');
+    return null;
+  }
+
+  // 4. python / python3 중 사용 가능한 것으로 호출
+  for (const cmd of ['python', 'python3']) {
+    const result = spawnSync(
+      cmd,
+      [MEDIA_PATCH_PY, pptxPath, '--video', videoPath],
+      { stdio: 'inherit', encoding: 'utf-8' }
+    );
+    if (result.status === 0) return videoPath;
+    if (result.error?.code === 'ENOENT') continue; // 명령어 없음 → 다음 시도
+    console.warn(`⚠️  영상 임베딩 실패 (${cmd}): exit ${result.status}`);
+    return null;
+  }
+
+  console.warn('⚠️  python/python3 미설치. 영상 임베딩 스킵.');
+  return null;
+}
+
 // ─── PPTX 변환 ───────────────────────────────────────────────────────────────
 
 async function convertToPPTX(htmlDir, outputPptxPath) {
@@ -432,6 +483,9 @@ async function exportDeck(plan, input, validation, outputPptxPath, theme) {
   console.log(`\n🎬 PPTX 변환...`);
   await convertToPPTX(htmlDir, outputPptxPath);
 
+  // 2-1. assets/ 동영상 → 커버 슬라이드 자동 임베딩
+  const embeddedVideo = embedVideoInCover(outputPptxPath);
+
   // 3. 스토리보드 MD
   const storyboard = generateStoryboard(plan, input);
   fs.writeFileSync(storyPath, storyboard, 'utf8');
@@ -459,6 +513,7 @@ async function exportDeck(plan, input, validation, outputPptxPath, theme) {
     storyboardPath:    storyPath,
     validationPath:    validPath,
     designValidPath,
+    embeddedVideo,
   };
 }
 

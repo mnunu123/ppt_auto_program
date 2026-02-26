@@ -248,8 +248,40 @@ def patch_pptx(pptx_path, spec, base_dir):
 # ─── 엔트리포인트 ─────────────────────────────────────────────────────────────
 
 def main():
+    # 직접 모드: python media-patch.py <pptx> --video <path> [--audio <path>]
+    if '--video' in sys.argv or '--audio' in sys.argv:
+        import argparse
+        parser = argparse.ArgumentParser(
+            description='PPTX cover slide에 video/audio 직접 임베딩')
+        parser.add_argument('pptx_path', help='대상 PPTX 경로')
+        parser.add_argument('--video', default=None, help='임베딩할 MP4 절대/상대 경로')
+        parser.add_argument('--audio', default=None, help='임베딩할 MP3 절대/상대 경로 (선택)')
+        args = parser.parse_args()
+
+        if not os.path.exists(args.pptx_path):
+            print(f"[media-patch] ERROR: PPTX not found: {args.pptx_path}")
+            sys.exit(1)
+
+        spec = {}
+        if args.video: spec['video'] = args.video
+        if args.audio: spec['audio'] = args.audio
+
+        # 상대 경로는 PPTX 파일 위치 기준으로 해석
+        base_dir = os.path.dirname(os.path.abspath(args.pptx_path))
+        try:
+            patch_pptx(args.pptx_path, spec, base_dir)
+        except Exception as e:
+            print(f"[media-patch] ERROR: {e}")
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
+        return
+
+    # 레거시 모드: python media-patch.py <pptx_path> <spec_path>
     if len(sys.argv) < 3:
-        print(f"Usage: python {sys.argv[0]} <pptx_path> <spec_path>")
+        print(f"Usage:")
+        print(f"  python {sys.argv[0]} <pptx_path> <spec_path>")
+        print(f"  python {sys.argv[0]} <pptx_path> --video <mp4_path> [--audio <mp3_path>]")
         sys.exit(1)
 
     pptx_path, spec_path = sys.argv[1], sys.argv[2]

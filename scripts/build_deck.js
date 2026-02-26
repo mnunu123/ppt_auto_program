@@ -200,6 +200,9 @@ async function run() {
   if (result.designValidPath) {
     console.log(`  디자인 검증:    ${result.designValidPath}`);
   }
+  if (result.embeddedVideo) {
+    console.log(`\n🎬 커버 동영상 임베딩 완료: ${path.basename(result.embeddedVideo)}`);
+  }
   console.log(`\n🔎 검증 결과: ${validation.summary.message}`);
 
   if (validation.summary.totalWarnings > 0) {
