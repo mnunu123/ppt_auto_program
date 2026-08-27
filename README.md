@@ -1,193 +1,105 @@
 # PPT Team Agent
 
-Claude Code Sub-Agent와 Skill 기반의 프레젠테이션 생성 도구입니다.
+Claude Code Sub-Agent + Skill 아키텍처로 "설득력 있는" 프레젠테이션을 자동 생성하는 도구입니다.
+HTML로 슬라이드를 만든 뒤 PPTX로 변환하며, 설득 규칙을 자동으로 강제·검증합니다.
 
-## 📋 프로젝트 소개
+- **Stack**: Node.js · Playwright(HTML→이미지) · pptxgenjs(PPTX 생성) · sharp · Claude Code Sub-Agent/Skill
 
-PPT Team Agent는 자동화된 프레젠테이션 생성을 위한 도구로, Claude AI의 Sub-Agent 시스템과 스킬 기반 아키텍처를 활용합니다.
+> 같은 프로젝트의 더 확장된 버전으로 [`ppt-agent`](https://github.com/mnunu123/ppt-agent)가 있습니다
+> (R0~R7 검증 규칙 전체, `pipeline.js`를 통한 리서치·영상 통합 자동화 등 추가 기능 포함).
+> 이 저장소는 핵심 CLI 파이프라인(`build_deck.js`)과 Sub-Agent 구성에 집중된 스냅샷입니다.
 
-## 🚀 주요 기능
+## 실제 구동 화면 (이미 생성된 결과물)
 
-- HTML을 PPTX 형식으로 변환
-- 자동화된 프레젠테이션 생성
-- Claude AI 기반 콘텐츠 생성
+이 저장소에는 실제로 실행해서 나온 결과물이 `output/`, `out/`에 이미 커밋되어 있습니다 —
+별도 실행 없이도 아래는 그 실제 산출물을 그대로 캡처한 화면입니다.
 
-## 📦 설치 방법
+![생성된 표지 슬라이드](screenshots/01-generated-cover-slide.png)
+*`output/slides/slide-01.html` — "이커머스 트렌드 & 수익화 전략" 주제로 실제 생성된 표지 슬라이드.*
 
-### 필수 요구사항
+![생성된 로드맵 슬라이드](screenshots/02-generated-roadmap-slide.png)
+*`output/slides/slide-12.html` — 마지막 슬라이드, 3단계 실행 로드맵 + CTA.*
 
-- Node.js (v16 이상)
-- npm 또는 yarn
+이 실행에서 나온 나머지 산출물도 저장소에 그대로 남아있습니다:
 
-### 설치
+- `output/research.md`, `research-findings.md`, `research-result.md` — research-agent 결과
+- `output/slide-outline.md`, `slides-spec.md` — organizer-agent 결과
+- `output/critique.md` — critic-agent가 잡아낸 규칙 위반 및 수정 지시
+- `output/slides/slide-01~12.html` — design-skill이 생성한 HTML 슬라이드 12장
+- `output/assets/cover-video.mp4`, `cover-audio.mp3` — 표지에 삽입된 실제 미디어
+- `out/*-storyboard.md`, `*-validation.md`, `*-copy-report.md` — `samples/` 예제 4건(policy_youth_rent, semis_rally 등)을 `build_deck.js`로 돌린 검증/카피 리포트
 
-```bash
-# 저장소 클론
-git clone https://github.com/YOUR_USERNAME/ppt_team_agent.git
-cd ppt_team_agent
+## 사용 방법 2가지
 
-# 의존성 설치
-npm install
-```
-
-## 🎯 사용 방법
-
-### HTML을 PPTX로 변환
-
-```bash
-npm run html2pptx
-```
-
-## 🛠 기술 스택
-
-- **pptxgenjs**: PowerPoint 파일 생성
-- **playwright**: 브라우저 자동화
-- **sharp**: 이미지 처리
-- **react-icons**: 아이콘 라이브러리
-
-## 📂 프로젝트 구조
-
-```
-ppt_team_agent/
-├── .claude/
-│   └── skills/
-│       └── pptx-skill/
-│           └── scripts/
-│               └── html2pptx.js
-├── node_modules/
-├── package.json
-├── package-lock.json
-└── README.md
-```
-
----
-
-## 설득형 PPT 자동화 파이프라인 (`build_deck`)
-
-주제가 무엇이든 "남을 설득하는 PPT 흐름"으로 자동 생성하고,
-규칙 위반을 자동 검수·수정 제안까지 하는 CLI 파이프라인입니다.
-
-### 빠른 시작
+### 1) CLI 파이프라인 — `build_deck.js`
 
 ```bash
 node scripts/build_deck.js --in samples/policy_youth_rent.json --out out/policy_youth_rent.pptx
 node scripts/build_deck.js --in samples/semis_rally.json       --out out/semis_rally.pptx
 ```
 
-### 산출물 (명령 1개로 5가지)
+주제가 무엇이든 "남을 설득하는 PPT 흐름"으로 자동 생성하고 규칙 위반을 자동 검수합니다.
+명령 1개로 PPTX·HTML 슬라이드·스토리보드·검증 리포트·카피 리포트 5가지가 나옵니다.
 
-| 파일 | 설명 |
-|------|------|
-| `[출력].pptx` | PowerPoint 파일 |
-| `[출력]_html/` | HTML 슬라이드 (슬라이드 단위 편집 가능) |
-| `[출력]-storyboard.md` | 제목만 읽는 스토리보드 (Title-only Test) |
-| `[출력]-validation.md` | 검증 리포트 + 레드팀 분석 |
-| `[출력]-copy-report.md` | 슬라이드별 제목 후보 10개 + 소유권 분석 |
-
-### 설득 흐름 3종 (자동 선택)
-
-| 흐름 | 선택 조건 | 슬라이드 구성 |
-|------|----------|--------------|
-| **가이드형** | goal에 "안내·지원·정책·신청" 포함 | 배경→대상→핵심3→주의→실행 |
-| **설득형** | goal에 "설득·투자·제안·매수" 포함 | 훅→문제→인사이트→증거2→해결→CTA |
-| **브리핑형** | 기타 | 현황→데이터2→분석→시사점→권고 |
-
-### 입력 JSON 스키마
+**입력 JSON 스키마**
 
 ```json
 {
   "audience":   "누구를 설득?",
   "goal":       "끝나고 무엇을 하게?",
   "topic":      "주제",
-  "one_liner":  "선택 — 없으면 자동 생성 (Rule 0)",
   "key_points": ["핵심 주장 / 근거 / 절차"],
-  "evidence": [
-    { "type": "stat|quote|case|rule", "text": "...", "source": "..." }
-  ],
+  "evidence": [{ "type": "stat|quote|case|rule", "text": "...", "source": "..." }],
   "cta":       ["다음 행동 3개"],
-  "copy_bank": [
-    { "text": "레퍼런스 문장", "tone": "선언|도발|담담|따뜻|권위",
-      "structure": "원칙형|대비형|3단리듬|질문형", "use": "표지|cta|hook" }
-  ],
-  "constraints": { "slide_count": 10, "title_len": "16~22", "no_paragraph": true },
-  "assets":     { "logo": "", "cover_bg": "" }
+  "constraints": { "slide_count": 10, "title_len": "16~22", "no_paragraph": true }
 }
 ```
 
-### 설득 규칙 (자동 강제)
+동영상 커버가 필요하면 `assets/`에 `.mp4`를 넣어두면 첫 슬라이드에 자동 임베딩됩니다
+(`output/assets/cover-video.mp4`가 실제 적용된 예시입니다. Python 3 필요, `assets/README.md` 참고).
 
-| 규칙 | 내용 | 강제 방식 |
-|------|------|---------|
-| **R0** | Deck One-liner 1문장 (10초 발화) | 없으면 자동 생성, 60자 초과 시 경고 |
-| **R1** | 제목 = 결론 (어쩌라고 테스트) | 주제형 제목 감지 → 실패 + 수정안 |
-| **R2** | 소유권 테스트 | 범용 표현 감지 → 실패 + 구체화 지시 |
-| **R3** | 카피뱅크 구조 차용 | 원문 단어 복제 금지, 패턴만 재작성 |
-| **R4** | 제목 16~22자 | 초과 시 자동 단축 + 경고 |
-| **R5** | 표지 레이아웃 제한 | cover_center_calm / cover_top_aligned만 허용 |
-| **R6** | 줄글 금지 | 30자+ 문장 감지 → 분할 제안 |
-| **R7** | 발표 후 자아비판 루프 | 검증 리포트에 포스트모템 템플릿 자동 생성 |
+### 2) Claude Code Sub-Agent 파이프라인 (`.claude/`)
 
-### 카피뱅크 운영법
-
-카피뱅크는 레퍼런스 문장을 **톤·구조·용도**로 태깅해 저장합니다.
-시스템은 구조만 차용하고 원문 단어는 절대 복제하지 않습니다.
-
-```json
-"copy_bank": [
-  { "text": "5분이면 된다 — 월세의 37%를 돌려받는 방법",
-    "tone": "선언", "structure": "수치형", "use": "표지" },
-  { "text": "신청한 사람만 받는다",
-    "tone": "도발", "structure": "선언형", "use": "cta" }
-]
-```
-
-**톤**: `선언` / `도발` / `담담` / `따뜻` / `권위`
-**구조**: `원칙형` / `대비형` / `3단리듬` / `질문형` / `수치형` / `선언형`
-**용도**: `표지` / `hook` / `cta` / `insight` / `risk`
-
-권장: 레퍼런스 최소 5개 이상 → 카피 품질 안정화
-
-### 파일 구조 (추가된 것)
+리서치 → 슬라이드 설계 → 품질 검수를 서로 다른 에이전트/스킬로 분리해 실행하는 구조입니다.
+`output/` 안의 실제 산출물이 바로 이 파이프라인을 한 번 완주한 결과입니다.
 
 ```
+research-agent   → output/research.md 생성 (리서치·근거 수집만, 슬라이드 판단 금지)
+organizer-agent  → slide-outline.md + slides-spec.md 생성
+critic-agent     → 위반 검사 → 통과 시 "ALL PASS", 위반 시 critique.md로 재작성 요청
+design-skill     → slides-spec.md → output/slides/*.html
+asset-skill      → 인포그래픽 이미지 I/O 스펙 (스펙 정의만, 구현 보류)
+pptx-skill       → output/slides/*.html → PPTX (16:9 고정, run.cjs로 실행)
+```
+
+## 설치
+
+```bash
+npm install
+```
+
+## 디렉터리 구조
+
+```
+.claude/
+  agents/                 research-agent / organizer-agent / critic-agent 정의
+  skills/
+    pptx-skill/            HTML → PPTX 변환
+    design-skill/           slides-spec.md → HTML 생성 규칙
+    asset-skill/            인포그래픽 자산 I/O 스펙 (구현 보류)
 scripts/
-  build_deck.js    — CLI 진입점 (명령 1개)
-  planner.js       — 설득 흐름 선택 + one_liner 강제
-  slide_writer.js  — 제목=결론 + 줄글 금지 적용
-  copywriter.js    — 제목 후보 10개 + 소유권 검증
-  validator.js     — R0~R7 전체 규칙 검증 + 레드팀
-  exporter.js      — HTML 생성 + PPTX 변환 + 리포트
-
-samples/
-  policy_youth_rent.json  — 가이드형 예시 (청년 월세지원)
-  semis_rally.json        — 설득형 예시 (반도체 빅3 급등)
-
-out/
-  *.pptx                  — 생성된 PPTX
-  *-storyboard.md         — 제목 스토리보드
-  *-validation.md         — 검증 리포트 + 레드팀
-  *-copy-report.md        — 제목 후보 + 소유권 분석
+  build_deck.js            CLI 진입점
+  planner.js                설득 흐름 선택
+  slide_writer.js            제목=결론 + 줄글 금지 적용
+  copywriter.js               제목 후보 생성 + 소유권 검증
+  validator.js                규칙 검증
+  exporter.js                 HTML 생성 + PPTX 변환 + 리포트
+  themes/bpt_premium.js        BPT_PREMIUM 테마 HTML 생성기
+samples/                    입력 예제 JSON
+assets/                     커버 영상(.mp4) 배치 위치
+out/, output/                실행 결과물 (이미 커밋된 실제 실행 예시 포함)
 ```
 
----
-
-## 🤝 기여하기
-
-이슈와 풀 리퀘스트는 언제나 환영합니다!
-
-## 📝 라이선스
+## 라이선스
 
 MIT License
-
-## 👤 작성자
-
-Builder Josh
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이 있으시면 이슈를 등록해주세요.
-
----
-
-Made with ❤️ by Builder Josh
-
